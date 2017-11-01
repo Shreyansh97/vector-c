@@ -23,15 +23,15 @@ typedef struct{
 /**
 	Initialises the vector pointer with an initial_size
 
-	@param vec The pointer of VECTOR that needs to be initialized
 	@param initial_size The initial size of the vector
 	@return The initialized pointer of VECTOR
 */
-VECTOR* init(VECTOR *vec,int initial_size){
+VECTOR* init(int initial_size){
+	VECTOR* vec=(VECTOR*) malloc(sizeof(VECTOR));
 	vec->arr=(int*) malloc(initial_size*sizeof(int));
 	vec->max_size=initial_size;
 	vec->size=0;
-	return 
+	return vec;
 }
 
 /**
@@ -72,7 +72,7 @@ BOOLEAN insert(VECTOR *vec,int position, int data){
 */
 
 BOOLEAN push_back(VECTOR *vec,int data){
-	return insert(vec,vec->size-1,data);
+	return insert(vec,vec->size,data);
 }
 
 /**
@@ -120,7 +120,7 @@ int get_front(VECTOR *vec){
 */
 
 int get_back(VECTOR *vec){
-	return get(vec,ved->size-1);
+	return get(vec,vec->size-1);
 }
 
 /**
@@ -147,13 +147,13 @@ BOOLEAN set(VECTOR *vec,int position,int data){
 	@return The removed element
 */
 
-int remove(VECTOR *vec, int position){
+int remove_elem(VECTOR *vec, int position){
 	if(position >= vec->size || position<0)
 		return INT_MIN;
 	int i;
 	int data=vec->arr[position];
 	for(i=position;i<vec->size;i++)
-		vec->arr[i]=vec->arr[i+1-];
+		vec->arr[i]=vec->arr[i+1];
 	vec->size--;
 	return data;
 }
@@ -166,7 +166,7 @@ int remove(VECTOR *vec, int position){
 */
 
 int pop_back(VECTOR *vec){
-	return remove(vec,vec->size-1);
+	return remove_elem(vec,vec->size-1);
 }
 
 /**
@@ -177,7 +177,7 @@ int pop_back(VECTOR *vec){
 */
 
 int pop_front(VECTOR *vec){
-	return remove(vec,0);
+	return remove_elem(vec,0);
 }
 
 /**
@@ -192,10 +192,8 @@ int pop_front(VECTOR *vec){
 BOOLEAN insert_array(VECTOR *vec,int *arr,int n){
 	int i;
 	int initial_size = vec->size;
-	BOOLEAN flag=TRUE;
 	for(i=0;i<n;i++){
-		flag = push_back(vec,arr[i]) && flag;
-		if(!flag){
+		if(!push_back(vec,arr[i])){
 			vec->size = initial_size;
 			return FALSE;
 		}
@@ -214,11 +212,10 @@ BOOLEAN insert_array(VECTOR *vec,int *arr,int n){
 VECTOR* add_vectors(VECTOR v1,VECTOR v2){
 	if(v1.size != v2.size)
 		return NULL;
-	VECTOR* sum=(VECTOR*) malloc(sizeof(VECTOR));
-	init(sum,v1.size);
+	VECTOR* sum=init(v1.size);
 	int i;
 	for(i=0;i<v1.size;i++)
-		sum->arr[i]=v1.arr[i]+v2.arr[i];
+		push_back(sum,v1.arr[i]+v2.arr[i]);
 	return sum;
 }
 
@@ -247,10 +244,12 @@ int dot_product(VECTOR v1,VECTOR v2){
 	@param scalar The scalar value by which the vector is to be multiplied
 */
 
-void multiply_scalar(VECTOR *vec,int scalar){
+VECTOR* multiply_scalar(VECTOR *vec,int scalar){
 	int i;
+	VECTOR *new_vec = init(vec->size);
 	for(i=0;i<vec->size;i++)
-		vec->arr[i]*=scalar;
+		push_back(new_vec,vec->arr[i]*scalar);
+	return new_vec;
 }
 
 /**
@@ -268,6 +267,18 @@ double norm(VECTOR vec){
 		val+=vec.arr[i]*vec.arr[i];
 	val = sqrt(val);
 	return val;
+}
+
+/**
+	Displays the vector
+
+	@param vec The vector to be displayed
+*/
+void show_vec(VECTOR vec){
+	int i;
+	for(i=0;i<vec.size;i++)
+		printf("%d ", vec.arr[i]);
+	printf("\n");
 }
 
 #endif
